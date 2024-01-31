@@ -118,9 +118,16 @@ pub fn main() {
     assert!(Auditor::check_auth(blob.sender_pk, &blob.c, blob.s));
 
     /* Implement your attack here, to find the index of the encrypted message */
+    let hash_c = blob.c.hash_to_curve();
+    for (i, m) in messages.iter().enumerate() {
 
-    unimplemented!();
-
+        let re_sender_pk = (blob.c.1 - m.0).into_affine();
+        let lhs = { Bls12_381::pairing(re_sender_pk, hash_c)};
+        let rhs = { Bls12_381::pairing(blob.rec_pk, blob.s)};
+        if lhs == rhs {
+            println!("index = {}", i);
+        }
+    }
     /* End of attack */
 }
 
